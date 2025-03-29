@@ -1,6 +1,6 @@
 import hashlib
 from flask import session
-from db import users_col, cart_col
+from models.db import users_col, cart_col
 
 def hash_password(password):
     return hashlib.md5(password.encode()).hexdigest()
