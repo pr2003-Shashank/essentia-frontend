@@ -17,7 +17,10 @@ def login():
     session['email'] = data["email"]
     return jsonify(result)
 
-@auth.route("/logout")
+@auth.route("/logout", methods=["POST"])
 def logout():
+    if 'email' not in session:
+        return jsonify({"error": "User is not logged in!"}), 400
+    
     session.pop('email', None)
     return jsonify({"message": "Logged out successfully!"})
