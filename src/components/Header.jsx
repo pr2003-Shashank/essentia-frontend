@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Logo from "../../assets/logo.png";
+import Logo from "../assets/logo.png";
 import { Box, Divider, Typography, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -58,7 +58,7 @@ function Header() {
   return (
     <div className="flex flex-row bg-white w-full items-center px-4 shadow-lg">
       {/* Logo */}
-      <div className="flex h-20 p-2">
+      <div className="flex h-20 w-30 p-2">
         {/* Mobile Menu Button */}
         <IconButton
           color="inherit"
@@ -69,7 +69,7 @@ function Header() {
         >
           <MenuIcon />
         </IconButton>
-        <img src={Logo} alt="Logo" className="h-full" />
+        <img src={Logo} alt="Logo" className="" />
       </div>
 
       {/* Title */}
@@ -80,8 +80,8 @@ function Header() {
           fontSize: { xs: "16px", sm: "18px", md: "20px", lg: "22px" },
           marginRight: 5
         }}
-        className="text-blue-900"
-      >
+        className="flex text-blue-900 max-[425px]:hidden sm:flex"
+        >
         ESSENTIA
       </Typography>
 

@@ -2,7 +2,7 @@ import { Divider, Typography} from '@mui/material';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import Logo from '../../assets/logo-white.png';
+import Logo from '../assets/logo-white.png';
 import React from 'react'
 
 function Footer() {
@@ -11,12 +11,12 @@ function Footer() {
       <div className='flex flex-row text-white m-2 text-center'>
         <img src={Logo} alt='logo' className='h-10 mr-2'/>
         <div className='flex items-center text-xs sm:text-sm md:text-base lg:text-lg'>        
-          Essentia - Fresh. Fast. Essentail
+          Essentia - Fast. Essentail
         </div>
         <div className='ml-auto'>
-        <InstagramIcon fontSize='large' className='pr-2'/>
-        <FacebookIcon fontSize='large' className='pr-2'/>
-        <LinkedInIcon fontSize='large' className='pr-2'/>
+        <InstagramIcon fontSize='large' className='pr-1'/>
+        <FacebookIcon fontSize='large' className='pr-1'/>
+        <LinkedInIcon fontSize='large' className='pr-1'/>
         </div>
       </div>
       <Divider className='bg-white'/>
@@ -27,7 +27,7 @@ function Footer() {
         justifyContent:'center',
         fontFamily:'Poppins, sans-serif',
         margin: 2,
-        fontSize: { xs: "14px", md: "16px", lg: "18px" },
+        fontSize: { xs: "12px", sm: "14px", md: "16px", lg: "16px" },
       }}
       >
         © 2025 Essentia. All rights reserved.
