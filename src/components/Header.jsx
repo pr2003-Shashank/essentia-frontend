@@ -58,7 +58,7 @@ function Header() {
   return (
     <div className="flex flex-row bg-white w-full items-center px-4 shadow-lg">
       {/* Logo */}
-      <div className="flex h-20 w-30 p-2">
+      <div className="flex h-20 p-2">
         {/* Mobile Menu Button */}
         <IconButton
           color="inherit"
@@ -69,7 +69,7 @@ function Header() {
         >
           <MenuIcon />
         </IconButton>
-        <img src={Logo} alt="Logo" className="" />
+        <img src={Logo} alt="Logo" className="h-full" />
       </div>
 
       {/* Title */}
