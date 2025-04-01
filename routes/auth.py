@@ -1,5 +1,5 @@
-from flask import Blueprint, request, session, jsonify
-from services.auth_service import register_user, validate_user
+from flask import Blueprint, request, jsonify
+from services.auth_service import register_user, validate_user, token_required
 
 auth = Blueprint("auth", __name__)
 
@@ -12,15 +12,17 @@ def register():
 def login():
     data = request.get_json()
     result = validate_user(data["email"], data["password"])
+    
     if "error" in result:
         return jsonify(result), 401
-    session['email'] = data["email"]
+    
     return jsonify(result)
 
 @auth.route("/logout", methods=["POST"])
 def logout():
-    if 'email' not in session:
-        return jsonify({"error": "User is not logged in!"}), 400
-    
-    session.pop('email', None)
     return jsonify({"message": "Logged out successfully!"})
+
+@auth.route("/protected", methods=["GET"])
+@token_required
+def protected_route(current_user):
+    return jsonify({"message": f"Hello, {current_user}!"})
