@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Logo from "../assets/logo.png";
-import { Box, Divider, Typography, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Box, Divider, Typography, Button, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText, Badge } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -41,8 +41,8 @@ function Header() {
                   fontFamily: "Poppins, sans-serif",
                   fontSize: { xs: "12px", sm: "14px", md: "16px", lg: "16px" },
                   "&:hover": {
-                    color:"rgb(30, 58, 138)",
-                    backgroundColor: "rgba(96, 165, 250, 0.3)", 
+                    color: "rgb(30, 58, 138)",
+                    backgroundColor: "rgba(96, 165, 250, 0.3)",
                   },
                 }}
               >
@@ -56,7 +56,7 @@ function Header() {
   );
 
   return (
-    <div className="flex flex-row bg-white w-full items-center px-4 shadow-lg">
+    <div className="flex flex-row bg-white w-full items-center px-4 shadow-md">
       {/* Logo */}
       <div className="flex h-20 p-2">
         {/* Mobile Menu Button */}
@@ -81,7 +81,7 @@ function Header() {
           marginRight: 5
         }}
         className="flex text-blue-900 max-[425px]:hidden sm:flex"
-        >
+      >
         ESSENTIA
       </Typography>
 
@@ -96,14 +96,14 @@ function Header() {
               key={item}
               sx={{
                 color: isActive ? "white" : "rgb(30, 58, 138)",
-                backgroundColor: isActive ? "rgb(96, 165, 250)" : "transparent", 
+                backgroundColor: isActive ? "rgb(96, 165, 250)" : "transparent",
                 textTransform: "capitalize",
-                marginRight:2,
+                marginRight: 2,
                 fontFamily: "Poppins, sans-serif",
                 fontSize: { xs: "12px", sm: "14px", md: "16px", lg: "16px" },
                 "&:hover": {
-                  color:"rgb(30, 58, 138)",
-                  backgroundColor: "rgba(96, 165, 250, 0.3)", 
+                  color: "rgb(30, 58, 138)",
+                  backgroundColor: "rgba(96, 165, 250, 0.3)",
                 },
               }}
               onClick={() => navigate(path)}
@@ -120,10 +120,12 @@ function Header() {
       {/* Login Button */}
       <div>
         <IconButton
-          sx={{ color: "rgb(30, 58, 138)" }}
+          sx={{ color: "rgb(30, 58, 138)" , paddingRight: 2}}
           onClick={() => navigate('/cart')}
         >
-          <ShoppingCartIcon />
+          <Badge badgeContent={2} color="primary">
+            <ShoppingCartIcon/>
+          </Badge>
         </IconButton>
         <Button
           variant="contained"
