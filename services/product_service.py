@@ -31,3 +31,17 @@ def remove_product(product_id):
     
     products_col.delete_one({"_id": ObjectId(product_id)})
     return {"message": "Product removed successfully!"}, 200
+
+def get_product_by_id(product_id):
+    try:
+        if not ObjectId.is_valid(product_id):  
+            return {"error": "Invalid product ID format"}, 400
+        
+        product = products_col.find_one({"_id": ObjectId(product_id)})
+        if not product:
+            return {"error": "Product not found"}, 404
+
+        product["_id"] = str(product["_id"])  
+        return {"product": product}, 200
+    except Exception as e:
+        return {"error": str(e)}, 500

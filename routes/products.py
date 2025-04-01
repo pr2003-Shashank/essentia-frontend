@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.product_service import add_product, get_all_products, remove_product
+from services.product_service import add_product, get_all_products, remove_product, get_product_by_id
 
 products = Blueprint("products", __name__)
 
@@ -20,6 +20,12 @@ def remove_product_route():
         return jsonify(response), status_code
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@products.route("/<product_id>", methods=["GET"])
+def get_product_by_id_route(product_id):
+    response, status_code = get_product_by_id(product_id)  
+    return jsonify(response), status_code  
+
 
 @products.route("/")
 def get_products():
