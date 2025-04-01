@@ -10,7 +10,7 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 # Register Blueprints
 app.register_blueprint(auth)
 app.register_blueprint(products, url_prefix="/products")
-app.register_blueprint(cart, url_prefix="/cart")
+# app.register_blueprint(cart, url_prefix="/cart")
 
 if __name__ == "__main__":
     app.run(debug=True)
