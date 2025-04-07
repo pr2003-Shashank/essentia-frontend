@@ -10,7 +10,7 @@ function ProductCard({ product }) {
     <Card
       className="p-2 shadow-lg flex flex-col"
       sx={{ width: '100%', cursor: 'pointer' }}
-      onClick={() => navigate(`/products/${product.id}`)}
+      onClick={() => navigate(`/products/${product._id}`)}
     >
       <div className="flex">
         <IconButton

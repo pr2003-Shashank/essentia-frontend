@@ -1,11 +1,12 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { Typography, Button, CardMedia, Box, Rating } from "@mui/material";
-import products from "../../services/ProductFetch";
+import { useProductById } from '../../hooks/useProducts';
 
 function ProductDetail() {
-  const { id } = useParams(); // Get Product ID from URL
-  const product = products.find((item) => item.id.toString() === id); // Find the product
+  const { productId } = useParams(); 
+
+  const { data: product, isLoading, error } = useProductById(productId);
 
   if (!product) {
     return (<Typography

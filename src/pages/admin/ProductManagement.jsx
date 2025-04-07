@@ -1,31 +1,93 @@
 import React from 'react';
-import products from '../../services/ProductFetch';
 import { Box, Chip, Paper, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Button, Stack, IconButton } from '@mui/material';
 import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/EditNoteOutlined';import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import EditIcon from '@mui/icons-material/EditNoteOutlined';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { useProductContext } from "../../context/ProductContext";
+import { useAddProduct, useRemoveProduct } from '../../hooks/useProducts';
 
 function ProductManagement() {
+    const { products } = useProductContext();
+    const { mutate: addProduct, isLoading, error } = useAddProduct(); // React Query mutation
+    const { mutate: removeProduct } = useRemoveProduct();
+
+    const [formData, setFormData] = useState({
+        name: "",
+        category: "",
+        price: "",
+        stock: "",
+        description: "",
+        image_url: "",
+    });
 
     const [searchQuery, setSearchQuery] = useState('');
-    const [addProduct, setAddProduct] = useState(false);
+    const [addingProduct, setAddingProduct] = useState(false);
     const [images, setImages] = useState([]);
 
-    const handleFileChange = (event) => {
-        const files = Array.from(event.target.files);
-        const imagePreviews = files.map((file) => ({
-            name: file.name,
-            url: URL.createObjectURL(file),
-        }));
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-        setImages((prev) => [...prev, ...imagePreviews]);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Send file to Flask backend
+            const response = await fetch("http://127.0.0.1:5000/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+            if (data.image_url) {
+                setImages([{ name: file.name, url: data.image_url }]);
+                setFormData((prev) => ({ ...prev, image_url: data.image_url }));
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (error) {
+            console.error("Image upload failed", error);
+            alert("Failed to upload image. Please try again.");
+        }
     };
 
-    const handleDelete = (imageName) => {
-        setImages(images.filter((img) => img.name !== imageName));
+
+    const handleDeleteImage = () => {
+        setImages([]);
+        setFormData({ ...formData, image: "" });
     };
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!formData.name || !formData.category || !formData.price || !formData.image_url || !formData.description || !formData.stock) {
+            alert("Please fill in all required fields");
+            return;
+        }
+
+        addProduct(formData, {
+            onSuccess: (newProduct) => {
+                alert("Product added successfully!");
+                setFormData({
+                    name: "",
+                    category: "",
+                    price: "",
+                    image_url: "",
+                    stock: "",
+                    description: "",
+                });
+                setImages([]);
+
+                // Close the add product form
+                setAddingProduct(false);
+            },
+        });
+
+    };
+
 
     // Filter products based on the search query
     const filteredProducts = products.filter((product) =>
@@ -43,28 +105,6 @@ function ProductManagement() {
         whiteSpace: 'nowrap',
         width: 1,
     });
-
-    const FormField = ({ label, id, multiline = false, rows = 1, type = 'text' }) => (
-        <>
-            <Typography
-                sx={{
-                    fontFamily: "Poppins, sans-serif",
-                    fontSize: { xs: "14px", sm: "14px", md: "16px", lg: "16px" },
-                }}
-            >
-                {label}
-            </Typography>
-            <TextField
-                sx={{ backgroundColor: "rgb(255, 255, 255)" }}
-                fullWidth
-                size="small"
-                id={id}
-                multiline={multiline}
-                rows={rows}
-                type={type}
-            />
-        </>
-    );
 
     return (
         <div className='flex flex-col'>
@@ -94,14 +134,14 @@ function ProductManagement() {
                         }}
                         className="!bg-blue-900 hover:!bg-blue-400"
                         onClick={(e) => {
-                            setAddProduct(!addProduct)
+                            setAddingProduct(!addingProduct)
                         }}
                     >
                         Add product
                     </Button>
                 </div>
             </div>
-            {addProduct &&
+            {addingProduct &&
                 <div className="flex w-full justify-center p-4">
                     <Stack
                         sx={{
@@ -110,8 +150,10 @@ function ProductManagement() {
                             backgroundColor: "rgb(96, 165, 250, 0.2)",
                             borderRadius: 2,
                         }}
-                        direction={{ xs: "column" }}
+                        direction="column"
                         spacing={1}
+                        component="form"
+                        onSubmit={handleSubmit}
                     >
                         <div className="flex">
                             <Button
@@ -121,7 +163,7 @@ function ProductManagement() {
                                 }}
                                 variant="outlined"
                                 onClick={(e) => {
-                                    setAddProduct(!addProduct)
+                                    setAddingProduct(!addingProduct)
                                 }}>
                                 <CloseIcon sx={{ fontSize: "16px" }} />
                             </Button>
@@ -138,11 +180,78 @@ function ProductManagement() {
                         >
                             Add a new product
                         </Typography>
-                        <FormField label="Product name:" id="name" />
-                        <FormField label="Product category:" id="category" />
-                        <FormField label="Price in (₹):" id="price" type='number' />
-                        <FormField label="Product initial stock:" id="stock" type='number' />
-                        <FormField label="Product description:" id="description" multiline rows={4} />
+                        {/* Form fields */}
+                        <Typography
+                            sx={{ fontFamily: "Poppins, sans-serif", fontSize: { xs: "14px", sm: "14px", md: "16px", lg: "16px" } }}>
+                            Product name:
+                        </Typography>
+                        <TextField
+                            sx={{ backgroundColor: "rgb(255, 255, 255)" }}
+                            fullWidth
+                            size="small"
+                            id="name"
+                            type="text"
+                            value={formData.name}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                        />
+
+                        <Typography
+                            sx={{ fontFamily: "Poppins, sans-serif", fontSize: { xs: "14px", sm: "14px", md: "16px", lg: "16px" } }}>
+                            Product Category:
+                        </Typography>
+                        <TextField
+                            sx={{ backgroundColor: "rgb(255, 255, 255)" }}
+                            fullWidth
+                            size="small"
+                            id="category"
+                            type="text"
+                            value={formData.category}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
+                        />
+
+                        <Typography
+                            sx={{ fontFamily: "Poppins, sans-serif", fontSize: { xs: "14px", sm: "14px", md: "16px", lg: "16px" } }}>
+                            Price in (₹):
+                        </Typography>
+                        <TextField
+                            sx={{ backgroundColor: "rgb(255, 255, 255)" }}
+                            fullWidth
+                            size="small"
+                            id="price"
+                            type="number"
+                            value={formData.price}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))}
+                        />
+
+                        <Typography
+                            sx={{ fontFamily: "Poppins, sans-serif", fontSize: { xs: "14px", sm: "14px", md: "16px", lg: "16px" } }}>
+                            Product initial stock:
+                        </Typography>
+                        <TextField
+                            sx={{ backgroundColor: "rgb(255, 255, 255)" }}
+                            fullWidth
+                            size="small"
+                            id="stock"
+                            type="number"
+                            value={formData.stock}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, stock: e.target.value }))}
+                        />
+
+                        <Typography
+                            sx={{ fontFamily: "Poppins, sans-serif", fontSize: { xs: "14px", sm: "14px", md: "16px", lg: "16px" } }}>
+                            Product Description:
+                        </Typography>
+                        <TextField
+                            sx={{ backgroundColor: "rgb(255, 255, 255)" }}
+                            fullWidth
+                            size="small"
+                            id="description"
+                            type="text"
+                            multiline
+                            rows={4}
+                            value={formData.description}
+                            onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                        />
                         <Typography
                             sx={{
                                 fontFamily: "Poppins, sans-serif",
@@ -157,7 +266,7 @@ function ProductManagement() {
                                 <Chip
                                     key={img.name}
                                     label={img.name}
-                                    onDelete={() => handleDelete(img.name)}
+                                    onDelete={() => handleDeleteImage(img.name)}
                                     avatar={<img src={img.url} alt={img.name} style={{ width: 32, height: 32, borderRadius: "50%" }} />}
                                     sx={{ maxWidth: 150 }}
                                 />
@@ -169,14 +278,15 @@ function ProductManagement() {
                             variant="contained"
                             tabIndex={-1}
                             startIcon={<CloudUploadIcon />}
-                            sx={{  display: 'flex',
+                            sx={{
+                                display: 'flex',
                                 width: 'fit-content',
                                 height: "fit-content",
                                 fontFamily: "Poppins, sans-serif",
                                 fontSize: { xs: "12px", sm: "12px", md: "14px", lg: "14px" },
                                 textTransform: 'none',
-                                 backgroundColor:"rgb(30, 58, 138) "
-                                }}
+                                backgroundColor: "rgb(30, 58, 138) "
+                            }}
                         >
                             Upload files
                             <VisuallyHiddenInput
@@ -186,23 +296,27 @@ function ProductManagement() {
                                 accept="image/jpeg, image/png, image/jpg"
                             />
                         </Button>
+                        {/*If error*/}
+                        {error && <Typography color="error">{error.message}</Typography>}
                         <div className='flex justify-end'>
-                        <Button
-                            type='submit'
-                            variant='contained'
-                            sx={{ 
-                                display: 'flex',
-                                height: "fit-content",
-                                width: "fit-content",
-                                fontFamily: "Poppins, sans-serif",
-                                fontSize: { xs: "12px", sm: "12px", md: "14px", lg: "14px" },
-                                textTransform: 'none',
-                                backgroundColor:"rgb(30, 58, 138)"}}
-                        >
-                            Submit
-                        </Button>
+                            <Button
+                                type='submit'
+                                variant='contained'
+                                disabled={isLoading}
+                                sx={{
+                                    display: 'flex',
+                                    height: "fit-content",
+                                    width: "fit-content",
+                                    fontFamily: "Poppins, sans-serif",
+                                    fontSize: { xs: "12px", sm: "12px", md: "14px", lg: "14px" },
+                                    textTransform: 'none',
+                                    backgroundColor: "rgb(30, 58, 138)"
+                                }}
+                            >
+                                {isLoading ? "Submitting..." : "Submit"}
+                            </Button>
                         </div>
-                        
+
                     </Stack>
                 </div>
             }
@@ -231,28 +345,33 @@ function ProductManagement() {
                                     <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]'>Category</TableCell>
                                     <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]' align='right'>Price</TableCell>
                                     <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]' align='right'>Stock</TableCell>
-                                    <TableCell align='center'  sx={{ minWidth: '100px' }}>Actions</TableCell>
+                                    <TableCell align='center' sx={{ minWidth: '100px' }}>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredProducts.map((product) => (
+                                {filteredProducts.map((product, index) => (
                                     <TableRow key={product.id}>
-                                        <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]'>{product.id}</TableCell>
+                                        <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]'>{index + 1}</TableCell>
                                         <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]'>{product.name}</TableCell>
                                         <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]'>{product.category}</TableCell>
                                         <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]' align='right'>{product.price}</TableCell>
                                         <TableCell className='!font-poppins !text-[12px] sm:!text-[12px] md:!text-[14px] lg:!text-[14px]' align='right'>{product.stock}</TableCell>
-                                        <TableCell  sx={{ minWidth: '150px' }} align='center'>
+                                        <TableCell sx={{ minWidth: '150px' }} align='center'>
                                             <IconButton
                                                 sx={{
-                                                    color:'rgb(30, 58, 138)'
+                                                    color: 'rgb(30, 58, 138)'
                                                 }}
                                             >
-                                                <EditIcon/>
+                                                <EditIcon />
                                             </IconButton>
                                             <IconButton
                                                 sx={{
-                                                    color:'rgb(30, 58, 138)'
+                                                    color: 'rgb(30, 58, 138)'
+                                                }}
+                                                onClick={() => {
+                                                    if (window.confirm("Are you sure you want to delete this product?")) {
+                                                        removeProduct(product._id);
+                                                    }
                                                 }}
                                             >
                                                 <DeleteIcon />

@@ -1,28 +1,44 @@
 import React from 'react';
 import { Typography, Grid, Pagination, Autocomplete, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import ProductCard from '../../components/ProductCard';
-import products from '../../services/ProductFetch';
 import categories from "../../services/CategoryFetch";
+import { useProductContext } from "../../context/ProductContext";
 
-
-const PRODUCTS_PER_PAGE = 12; //pagination
 
 function Products() {
+  const { products, isLoading, error } = useProductContext();
 
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Calculate total pages
-  const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
-
-  // Get products for the current page
+  const PRODUCTS_PER_PAGE = 10; // Change as needed
+  
+  // Handle category selection
+  const handleCategoryChange = (event, newValue) => {
+      setSelectedCategories(newValue.map(category => category.name));
+  };
+  
+  // Filter products by selected categories
+  const filteredProducts = selectedCategories.length
+      ? products.filter(product => selectedCategories.includes(product.category))
+      : products;
+  
+  // Reset page when category changes
+  useEffect(() => {
+      setCurrentPage(1);
+  }, [selectedCategories]);
+  
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
-  const currentProducts = products.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+  const currentProducts = filteredProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
+  
 
   // Handle page change
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
   };
+
   return (
     <div className='flex flex-col'>
       <div className='flex w-full flex-col sm:flex-row'>
@@ -47,6 +63,7 @@ function Products() {
             id="categories-selector"
             options={categories}
             getOptionLabel={(option) => option.name}
+            onChange={handleCategoryChange}
             renderInput={(params) => (
               <TextField {...params} label="Category" placeholder="Search by Category" />
             )}
@@ -58,11 +75,11 @@ function Products() {
         </div>
       </div>
       <div className='flex w-full p-4'>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} justifyContent='center' columns={12} sx={{width: '100%'}}>
           {currentProducts.map((product) => (
             <Grid
               size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-              key={product.id}
+              key={product._id}
             >
               <ProductCard product={product} />
             </Grid>

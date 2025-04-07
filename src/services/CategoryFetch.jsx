@@ -9,11 +9,23 @@ const categories = [
     },
     {
         id:3,
-        name: "Backery"   
+        name: "Bakery"   
     },
     {
         id:4,
+        name: "Biscuits"
+    },
+    {
+        id:5,
         name: "Nuts & Dry Fruits"
+    },
+    {
+        id:6,
+        name: "Grains & Pulses"
+    },
+    {
+        id:7,
+        name: "Snacks"
     }
 ]
 
