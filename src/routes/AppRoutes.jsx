@@ -11,6 +11,9 @@ import Cart from '../pages/user/Cart';
 import Checkout from '../pages/user/Checkout';
 import ProductManagement from '../pages/admin/ProductManagement';
 
+
+const isLoggedIn = localStorage.getItem("user");
+
 function AppRoutes() {
   return (
     <Routes>
@@ -34,6 +37,11 @@ function AppRoutes() {
       
       {/* Fallback Route */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route
+  path="/home"
+  element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
+/>
     </Routes>
   );
 }

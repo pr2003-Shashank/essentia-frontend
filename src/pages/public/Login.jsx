@@ -20,11 +20,35 @@ function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login form submitted:', formData);
-    // Add your authentication logic here
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        alert("Login Successful!");
+        setTimeout(() => {
+          navigate('/home');
+        }, 2000);
+      } else {
+        alert(data.message || "Login failed!");
+      }
+  
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
+  
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 p-4">
