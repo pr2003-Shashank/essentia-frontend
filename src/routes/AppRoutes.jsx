@@ -22,7 +22,7 @@ function AppRoutes() {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/products" element={<Products />} />
-      <Route path="/products/:id" element={<ProductDetails />} />
+      <Route path="/products/:productId" element={<ProductDetails />} />
       
       {/* Authentication Routes */}
       <Route path="/login" element={<Login />} />
