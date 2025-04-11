@@ -1,7 +1,7 @@
 import jwt
 import datetime
 from models.db import users_col
-from ..utils import hash_password
+import utils
 import os
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -12,7 +12,7 @@ def register_user(data):
     
     users_col.insert_one({
         "email": data['email'],
-        "password": hash_password(data['password']),
+        "password": utils.hash_password(data['password']),
         "firstName": data['firstName'],
         "lastName": data['lastName'],
         "phone": data['phone'],
@@ -24,7 +24,7 @@ def register_user(data):
 def validate_user(email, password):
     user = users_col.find_one({"email": email})
     
-    if user and user["password"] == hash_password(password):
+    if user and user["password"] == utils.hash_password(password):
         # Increment token version
         new_token_version = user["token_version"] + 1
         users_col.update_one({"email": email}, {"$set": {"token_version": new_token_version}})
