@@ -29,7 +29,7 @@ def get_cart(user_email):
                 "name": product["name"]
             })
 
-    return {"cart": products}, 200
+    return {"cart": products}
 
 def remove_from_cart(user_email, product_id):
     user = users_col.find_one({"email": user_email})
