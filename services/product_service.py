@@ -45,3 +45,23 @@ def get_product_by_id(product_id):
         return {"product": product}, 200
     except Exception as e:
         return {"error": str(e)}, 500
+
+def get_product_by_name(name):
+    try:
+        # Split input name into words and build regex filters (case-insensitive)
+        search_words = name.strip().split()
+        regex_filters = [{"name": {"$regex": word, "$options": "i"}} for word in search_words]
+
+        # Use $or to match if any word is found in the product name
+        products = list(products_col.find({"$or": regex_filters}))
+
+        if not products:
+            return {"error": "No product found with matching name keywords"}, 404
+
+        for product in products:
+            product["_id"] = str(product["_id"])
+
+        return {"products": products}, 200
+
+    except Exception as e:
+        return {"error": str(e)}, 500
