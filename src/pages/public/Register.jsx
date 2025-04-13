@@ -9,12 +9,14 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phone: ''
   });
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -36,9 +38,11 @@ function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
+          phone: formData.phone
         }),
       });
   
@@ -58,7 +62,6 @@ function Register() {
       alert("Something went wrong. Please try again.");
     }
   };
-  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 p-4">
@@ -93,11 +96,35 @@ function Register() {
         <form onSubmit={handleSubmit} className="p-6">
           <TextField
             fullWidth
-            label="Full Name"
-            name="name"
+            label="First Name"
+            name="firstName"
             variant="outlined"
             margin="normal"
-            value={formData.name}
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'rgb(30, 58, 138)',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgb(30, 58, 138)',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: 'rgb(30, 58, 138)',
+              },
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Last Name"
+            name="lastName"
+            variant="outlined"
+            margin="normal"
+            value={formData.lastName}
             onChange={handleChange}
             required
             sx={{
@@ -123,6 +150,30 @@ function Register() {
             variant="outlined"
             margin="normal"
             value={formData.email}
+            onChange={handleChange}
+            required
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'rgb(30, 58, 138)',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgb(30, 58, 138)',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: 'rgb(30, 58, 138)',
+              },
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Phone Number"
+            name="phone"
+            variant="outlined"
+            margin="normal"
+            value={formData.phone}
             onChange={handleChange}
             required
             sx={{
