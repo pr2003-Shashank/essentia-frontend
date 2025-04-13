@@ -54,8 +54,8 @@ def create_payment_route(current_user):
         "intent": "sale",
         "payer": {"payment_method": "paypal"},
         "redirect_urls": {
-            "return_url": "http://localhost:3000/payment-success",
-            "cancel_url": "http://localhost:3000/payment-cancel"
+            "return_url": "http://localhost:3000/payment-success", #frontend return url
+            "cancel_url": "http://localhost:3000/payment-cancel" #frontend cancel url
         },
         "transactions": [{
             "amount": {
