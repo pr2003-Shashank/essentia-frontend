@@ -25,12 +25,12 @@ def remove_product_route(current_user):
         return jsonify({"error": str(e)}), 500
     
 @products.route("/<product_id>", methods=["GET"])
-def get_product_by_id_route(current_user,product_id):
+def get_product_by_id_route(product_id):
     response, status_code = get_product_by_id(product_id)  
     return jsonify(response), status_code  
 
 @products.route("/get_by_name", methods=["POST"])
-def get_product_by_name_route(current_user):
+def get_product_by_name_route():
     try:
         data = request.get_json()
         if not data or "name" not in data:
@@ -43,7 +43,7 @@ def get_product_by_name_route(current_user):
         return jsonify({"error": str(e)}), 500
 
 @products.route("/")
-def get_products(current_user):
+def get_products():
     response, status_code = get_all_products() 
     return jsonify(response), status_code  
 
