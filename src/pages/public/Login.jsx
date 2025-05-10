@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, TextField, Typography, Divider, IconButton, InputAdornment } from '@mui/material';
+import {
+  Button,
+  TextField,
+  Typography,
+  IconButton,
+  InputAdornment,
+  Divider
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Logo from '../../assets/logo.png';
 
@@ -14,41 +21,43 @@ function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      const res = await fetch("http://127.0.0.1:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
       });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user));
+
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token); // Store JWT for auth
         alert("Login Successful!");
-        setTimeout(() => {
-          navigate('/home');
-        }, 2000);
+        navigate("/home");
       } else {
-        alert(data.message || "Login failed!");
+        alert(data.message || "Login failed. Please try again.");
       }
-  
     } catch (error) {
       console.error("Login error:", error);
-      alert("An error occurred. Please try again.");
+      alert("Something went wrong. Please try again.");
     }
   };
-  
-  
+
+  const inputStyle = {
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': { borderColor: 'rgb(30, 58, 138)' },
+      '&:hover fieldset': { borderColor: 'rgb(30, 58, 138)' },
+    },
+    '& .MuiInputLabel-root': {
+      color: 'rgb(30, 58, 138)',
+    },
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-blue-50 p-4">
@@ -57,8 +66,8 @@ function Login() {
         <div className="bg-blue-900 p-6 text-center">
           <div className="flex justify-center items-center mb-4">
             <img src={Logo} alt="Essentia Logo" className="h-12 mr-3" />
-            <Typography 
-              variant="h5" 
+            <Typography
+              variant="h5"
               sx={{
                 fontFamily: 'Poppins, sans-serif',
                 fontWeight: 600,
@@ -68,14 +77,14 @@ function Login() {
               ESSENTIA
             </Typography>
           </div>
-          <Typography 
+          <Typography
             variant="subtitle1"
             sx={{
               fontFamily: 'Poppins, sans-serif',
               color: 'white'
             }}
           >
-            Welcome back! Please login to your account
+            Welcome back! Log in to continue.
           </Typography>
         </div>
 
@@ -91,19 +100,7 @@ function Login() {
             value={formData.email}
             onChange={handleChange}
             required
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'rgb(30, 58, 138)',
-                },
-                '&:hover fieldset': {
-                  borderColor: 'rgb(30, 58, 138)',
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: 'rgb(30, 58, 138)',
-              },
-            }}
+            sx={inputStyle}
           />
 
           <TextField
@@ -129,35 +126,8 @@ function Login() {
                 </InputAdornment>
               )
             }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'rgb(30, 58, 138)',
-                },
-                '&:hover fieldset': {
-                  borderColor: 'rgb(30, 58, 138)',
-                },
-              },
-              '& .MuiInputLabel-root': {
-                color: 'rgb(30, 58, 138)',
-              },
-            }}
+            sx={inputStyle}
           />
-
-          <div className="flex justify-end mb-4">
-            <Button 
-              variant="text" 
-              size="small"
-              sx={{
-                color: 'rgb(30, 58, 138)',
-                fontFamily: 'Poppins, sans-serif',
-                textTransform: 'none'
-              }}
-              onClick={() => console.log('Forgot password clicked')}
-            >
-              Forgot Password?
-            </Button>
-          </div>
 
           <Button
             fullWidth
@@ -168,6 +138,7 @@ function Login() {
               color: 'white',
               fontFamily: 'Poppins, sans-serif',
               padding: '10px',
+              marginTop: '16px',
               '&:hover': {
                 backgroundColor: 'rgb(59, 130, 246)',
               }
@@ -177,14 +148,14 @@ function Login() {
           </Button>
 
           <Divider sx={{ my: 3, borderColor: 'rgba(30, 58, 138, 0.3)' }}>
-            <Typography 
-              variant="body2" 
+            <Typography
+              variant="body2"
               sx={{
                 color: 'rgb(30, 58, 138)',
                 fontFamily: 'Poppins, sans-serif'
               }}
             >
-              OR
+              DON'T HAVE AN ACCOUNT?
             </Typography>
           </Divider>
 
@@ -203,7 +174,7 @@ function Login() {
             }}
             onClick={() => navigate('/register')}
           >
-            Create New Account
+            Register Now
           </Button>
         </form>
       </div>
